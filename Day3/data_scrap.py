@@ -1,9 +1,6 @@
-from bs4 import BeautifulSoup
 import pandas as pd
-import os
-
 # Directory containing HTML files
-directory = '/workspaces/codespaces-blank/'
+directory = '/content/btech/found'
 
 # Initialize a list to store the scraped data
 data = []
@@ -12,14 +9,14 @@ data = []
 for filename in os.listdir(directory):
     if filename.endswith(".html"):  # Ensure it's an HTML file
         file_path = os.path.join(directory, filename)
-        
+
         # Read the content of the file
         with open(file_path, 'r', encoding='utf-8') as file:
             file_data = file.read()
-        
+
         # Parse the HTML content using BeautifulSoup
         soup = BeautifulSoup(file_data, 'html.parser')
-        
+
         # Extract relevant elements
         div_1 = soup.find("div", {"class": "cont_outer"})
         if div_1:
@@ -30,11 +27,11 @@ for filename in os.listdir(directory):
                     table_2 = div_2.find("table")
                     if table_2:
                         td_all = table_2.findAll("td", {"class": "border1"})
-                        
-                        # Extract SGPA and CGPA values
-                        sgpa = td_all[-6:-5][0].text.replace("SGPA", "").strip() if len(td_all) >= 6 else None
-                        cgpa = td_all[-4:-3][0].text.replace("CGPA", "").strip() if len(td_all) >= 4 else None
-                        
+
+                        # Simplified index and length checks
+                        sgpa = td_all[-6].text.replace("SGPA", "").strip() if len(td_all) > 6 else None
+                        cgpa = td_all[-4].text.replace("CGPA", "").strip() if len(td_all) > 4 else None
+
                         # Append the scraped data to the list
                         data.append({
                             "file_name": filename,
@@ -53,11 +50,11 @@ for filename in os.listdir(directory):
 # Convert the list of dictionaries to a DataFrame
 if data:  # Only create a DataFrame if there's data
     df = pd.DataFrame(data)
-    
+
     # Save the scraped data to a CSV file
-    output_csv_path = '/workspaces/codespaces-blank/btech_scrap.csv'
+    output_csv_path = '/content/btech.csv'
     df.to_csv(output_csv_path, index=False)
-    
+
     print(f"Data scraping complete. Results saved to '{output_csv_path}'.")
 else:
     print("No data was found to scrape.")
